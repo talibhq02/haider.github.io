@@ -275,8 +275,8 @@
   .calc-grid button:hover{background:var(--paper);}
   .calc-grid button.op{color:var(--blue); font-weight:700;}
   .calc-grid button.eq{background:var(--yellow); font-weight:700; grid-row:span 2;}
-  .calc-grid button.zero{grid-column:span 2;}
   .calc-grid button.clear{color:#D14343; font-weight:700;}
+  .calc-grid button.ghost{background:var(--paper); cursor:default;}
 
   /* hangman demo */
   .hangman-widget{max-width:420px;}
@@ -422,7 +422,7 @@
           <h3>Banking Management System</h3>
           <span class="chip">C</span>
         </div>
-        <p class="desc">Console-based system with account creation, deposits, withdrawals, and balance checks — built with file handling so the data survives after you close the terminal. This is a live browser port of the same command logic.</p>
+        <p class="desc">The actual menu-driven flow from the C source — customer details, savings (min ₹5,000) or current (min ₹15,000) accounts, deposits and withdrawals with the same validation quirks as the original. Numbered options only, just like scanf().</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
           <div class="card-actions">
@@ -431,15 +431,13 @@
           </div>
         </div>
         <div class="demo-panel" id="demo-banking">
-          <p class="demo-label">type a command below — try: help</p>
+          <p class="demo-label">type the number of your choice and press enter</p>
           <div class="mini-term">
-            <div class="mini-term-out" id="bankOut">
-              <p>Banking Management System — browser edition</p>
-              <p>type <b>help</b> to see available commands</p>
-            </div>
+            <div class="mini-term-out" id="bankOut"></div>
             <div class="mini-term-input-row">
               <span class="prompt">$</span>
-              <input type="text" id="bankInput" class="mini-term-input" placeholder="create Habeeb" autocomplete="off" spellcheck="false">
+              <input type="text" id="bankInput" class="mini-term-input" placeholder="1" autocomplete="off" spellcheck="false">
+              <button class="run-btn" style="padding:5px 10px;" onclick="bankRestart()">↻</button>
             </div>
           </div>
         </div>
@@ -451,7 +449,7 @@
           <h3>Mood Music Recommender</h3>
           <span class="chip">Python</span>
         </div>
-        <p class="desc">A semi-smart script that recommends songs from a playlist based on your mood. Not quite AI, but it has opinions. Rebuilt here with the same rule-based logic.</p>
+        <p class="desc">Reads how you're feeling, runs it through a BERT sentiment model, maps the star rating to a mood (1–2★ sad, 3★ nostalgic, 4★ happy, 5★ energetic), and opens your pick in YouTube Music. Type a feeling below — this uses a lightweight keyword approximation of that same star mapping since a 600MB BERT model can't run in a browser tab.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
           <div class="card-actions">
@@ -460,15 +458,14 @@
           </div>
         </div>
         <div class="demo-panel" id="demo-mood">
-          <p class="demo-label">pick a mood:</p>
-          <div class="mood-btns">
-            <button class="mood-btn" onclick="recommendMood('happy')">😊 happy</button>
-            <button class="mood-btn" onclick="recommendMood('chill')">🌊 chill</button>
-            <button class="mood-btn" onclick="recommendMood('hype')">🔥 hype</button>
-            <button class="mood-btn" onclick="recommendMood('focus')">🎯 focus</button>
-            <button class="mood-btn" onclick="recommendMood('heartbroken')">💔 heartbroken</button>
+          <div class="mini-term">
+            <div class="mini-term-out" id="moodOut"></div>
+            <div class="mini-term-input-row">
+              <span class="prompt">$</span>
+              <input type="text" id="moodInput" class="mini-term-input" placeholder="I'm exhausted but kind of hyped for tonight" autocomplete="off" spellcheck="false">
+              <button class="run-btn" style="padding:5px 10px;" onclick="moodRestart()">↻</button>
+            </div>
           </div>
-          <div class="mood-result" id="moodResult">choose a mood above and I'll recommend something — click again for another pick</div>
         </div>
       </div>
 
@@ -478,7 +475,7 @@
           <h3>GUI Calculator</h3>
           <span class="chip">Python · Tkinter</span>
         </div>
-        <p class="desc">My first project with an actual visual interface instead of a blinking cursor. Buttons that click and numbers that add up — same layout, running in HTML/CSS/JS here.</p>
+        <p class="desc">Same logic as the source: types into a single field, splits on the first matching operator (+, then −, then ×, then ÷), and converts both halves to numbers. That means no chained expressions — try "5*3-2" and watch it break exactly like the original does. Division by zero is handled gracefully; anything else invalid shows "Error: Invalid input."</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
           <div class="card-actions">
@@ -488,29 +485,31 @@
         </div>
         <div class="demo-panel" id="demo-calc">
           <div class="calc-widget">
-            <input type="text" id="calcDisplay" class="calc-display" readonly value="0" aria-label="calculator display">
+            <input type="text" id="calcDisplay" class="calc-display" readonly value="" placeholder="0" aria-label="calculator display">
             <div class="calc-grid">
-              <button class="clear" onclick="calcPress('C')">C</button>
-              <button onclick="calcPress('⌫')">⌫</button>
-              <button class="op" onclick="calcPress('%')">%</button>
-              <button class="op" onclick="calcPress('/')">÷</button>
-              <button onclick="calcPress('7')">7</button>
-              <button onclick="calcPress('8')">8</button>
-              <button onclick="calcPress('9')">9</button>
-              <button class="op" onclick="calcPress('*')">×</button>
-              <button onclick="calcPress('4')">4</button>
-              <button onclick="calcPress('5')">5</button>
-              <button onclick="calcPress('6')">6</button>
-              <button class="op" onclick="calcPress('-')">−</button>
-              <button onclick="calcPress('1')">1</button>
-              <button onclick="calcPress('2')">2</button>
-              <button onclick="calcPress('3')">3</button>
-              <button class="op" onclick="calcPress('+')">+</button>
-              <button class="zero" onclick="calcPress('0')">0</button>
-              <button onclick="calcPress('.')">.</button>
-              <button class="eq" onclick="calcPress('=')">=</button>
+              <button class="clear" onclick="calcClear()">C</button>
+              <button class="op" onclick="calcAppend('*')">×</button>
+              <button class="op" onclick="calcAppend('/')">÷</button>
+              <button class="ghost" disabled aria-hidden="true"></button>
+              <button onclick="calcAppend('7')">7</button>
+              <button onclick="calcAppend('8')">8</button>
+              <button onclick="calcAppend('9')">9</button>
+              <button class="op" onclick="calcAppend('-')">−</button>
+              <button onclick="calcAppend('4')">4</button>
+              <button onclick="calcAppend('5')">5</button>
+              <button onclick="calcAppend('6')">6</button>
+              <button class="op" onclick="calcAppend('+')">+</button>
+              <button onclick="calcAppend('1')">1</button>
+              <button onclick="calcAppend('2')">2</button>
+              <button onclick="calcAppend('3')">3</button>
+              <button class="ghost" disabled aria-hidden="true"></button>
+              <button class="ghost" disabled aria-hidden="true"></button>
+              <button onclick="calcAppend('0')">0</button>
+              <button onclick="calcAppend('.')">.</button>
+              <button class="eq" onclick="calcEquals()">=</button>
             </div>
           </div>
+          <p class="demo-label" style="margin-top:10px;">keyboard works too — digits, + − × ÷ as <b>*</b> <b>/</b>, Enter to calculate, Backspace to clear (matches the original's key bindings)</p>
         </div>
       </div>
 
@@ -520,7 +519,7 @@
           <h3>Hangman</h3>
           <span class="chip">Swift</span>
         </div>
-        <p class="desc">A fully playable word-guessing game with letter tracking and win/loss logic. No mercy for wrong guesses — same rules, playable right here.</p>
+        <p class="desc">Text-based, 6 lives, one letter at a time. Same word bank as the Swift original — no mercy for wrong guesses.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
           <div class="card-actions">
@@ -676,8 +675,8 @@
     if(isOpen && id === 'demo-hangman' && !hangInitialized){ hangNewGame(); }
   }
 
-  /* ---------- Banking Management System (browser port) ---------- */
-  const bankState = { accounts: {}, active: null };
+  /* ---------- Banking Management System (faithful port of banking.c) ---------- */
+  const bankState = { id: 504023, name: 'Habeeb Ahmad', acc: 2030405060, bal_s: 0, bal_c: 0, c: 0, stage: 'menu' };
   const bankOut = document.getElementById('bankOut');
   const bankInput = document.getElementById('bankInput');
 
@@ -689,44 +688,208 @@
     bankOut.scrollTop = bankOut.scrollHeight;
   }
 
-  function handleBankCommand(raw){
-    const tokens = raw.trim().split(/\s+/).filter(Boolean);
-    if(tokens.length === 0) return;
-    const cmd = tokens[0].toLowerCase();
-
-    if(cmd === 'help'){
-      bankPrint('commands: create <name> · deposit <amount> · withdraw <amount> · balance · accounts · clear');
-    } else if(cmd === 'create'){
-      const name = tokens[1];
-      if(!name){ bankPrint('usage: create <name>', 'err'); return; }
-      if(!(name in bankState.accounts)) bankState.accounts[name] = 0;
-      bankState.active = name;
-      bankPrint(`account "${name}" ready — active account. balance: ₹${bankState.accounts[name]}`, 'ok');
-    } else if(cmd === 'deposit'){
-      const amount = parseFloat(tokens[1]);
-      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
-      if(isNaN(amount) || amount <= 0){ bankPrint('usage: deposit <positive amount>', 'err'); return; }
-      bankState.accounts[bankState.active] += amount;
-      bankPrint(`deposited ₹${amount}. new balance: ₹${bankState.accounts[bankState.active]}`, 'ok');
-    } else if(cmd === 'withdraw'){
-      const amount = parseFloat(tokens[1]);
-      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
-      if(isNaN(amount) || amount <= 0){ bankPrint('usage: withdraw <positive amount>', 'err'); return; }
-      if(amount > bankState.accounts[bankState.active]){ bankPrint('insufficient balance', 'err'); return; }
-      bankState.accounts[bankState.active] -= amount;
-      bankPrint(`withdrew ₹${amount}. new balance: ₹${bankState.accounts[bankState.active]}`, 'ok');
-    } else if(cmd === 'balance'){
-      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
-      bankPrint(`${bankState.active}: ₹${bankState.accounts[bankState.active]}`);
-    } else if(cmd === 'accounts'){
-      const names = Object.keys(bankState.accounts);
-      if(names.length === 0){ bankPrint('no accounts yet — try: create <name>'); return; }
-      names.forEach(n => bankPrint(`${n}: ₹${bankState.accounts[n]}${n===bankState.active ? '  (active)' : ''}`));
-    } else if(cmd === 'clear'){
-      bankOut.innerHTML = '';
+  function bankShowDetails(){
+    bankPrint('DETAILS');
+    bankPrint(`Customer ID: ${bankState.id}`);
+    bankPrint(`Name: ${bankState.name}`);
+    bankPrint(`Account no.: ${bankState.acc}`);
+    if(bankState.bal_s > 0){
+      bankPrint('Account type: Savings.');
+      bankPrint(`Balance: ${bankState.bal_s}`);
+    } else if(bankState.bal_c > 0){
+      bankPrint('Account type: Current.');
+      bankPrint(`Balance: ${bankState.bal_c}`);
     } else {
-      bankPrint(`command not found: ${cmd} (try: help)`, 'err');
+      bankPrint('Err: no option found!', 'err');
     }
+    bankPrint('Press 1 to return to main menu.   Press 0 to exit.');
+  }
+
+  function bankShowPrompt(stage){
+    switch(stage){
+      case 'menu':
+        bankPrint('What shall I assist you with?');
+        bankPrint('1.Customer details   2.Deposit   3.Withdraw   0.Exit');
+        break;
+      case 'details': {
+        bankPrint(`Customer ID: ${bankState.id}`);
+        bankPrint(`Name: ${bankState.name}`);
+        bankPrint('Press 1 to return to main menu.');
+        if(bankState.bal_s === 0 || bankState.bal_c === 0) bankPrint('Would you like to open an account? Press 2.');
+        bankPrint('Press 0 to exit.');
+        break;
+      }
+      case 'account_select':
+        bankPrint('1.Savings   2.Current   3.Main menu');
+        break;
+      case 'account_confirm_savings':
+        bankPrint('Minimum balance required is: Rs. 5000');
+        bankPrint('Would you like to deposit? Press 1.   Press 0 to Close.');
+        break;
+      case 'account_confirm_current':
+        bankPrint('Minimum balance required is: Rs. 15000');
+        bankPrint('Would you like to deposit? Press 1.   Press 0 to Close.');
+        break;
+      case 'deposit_amount_savings':
+        bankPrint('Enter amount you want to deposit in your Savings account:');
+        break;
+      case 'deposit_amount_current':
+        bankPrint('Enter amount you want to deposit in your Current account:');
+        break;
+      case 'deposit_select':
+        bankPrint('1.Savings account   2.Current account   3.Main menu');
+        break;
+      case 'deposit_amount_general_savings':
+      case 'deposit_amount_general_current':
+        bankPrint('Enter amount you want to deposit:');
+        break;
+      case 'withdraw_select':
+        bankPrint('1.Savings account   2.Current account   3.Main menu');
+        break;
+      case 'withdraw_amount_savings':
+      case 'withdraw_amount_current':
+        bankPrint('Enter amount you want to withdraw:');
+        break;
+      case 'show':
+        bankShowDetails();
+        break;
+      case 'closed':
+        bankPrint('Thank you for using this code!', 'ok');
+        bankPrint('(session ended — click ↻ to restart)');
+        break;
+    }
+  }
+
+  function bankGoto(stage){
+    bankState.stage = stage;
+    bankShowPrompt(stage);
+  }
+
+  function bankDepositEntry(){
+    // mirrors deposit() being invoked straight from the main menu, using whatever c currently is
+    if(bankState.c === 1) bankGoto('deposit_amount_savings');
+    else if(bankState.c === 2) bankGoto('deposit_amount_current');
+    else bankGoto('deposit_select');
+  }
+
+  function bankHandleInput(raw){
+    const n = parseFloat(raw.trim());
+    const stage = bankState.stage;
+
+    switch(stage){
+      case 'menu':
+        if(n === 1) bankGoto('details');
+        else if(n === 2) bankDepositEntry();
+        else if(n === 3) bankGoto('withdraw_select');
+        else if(n === 0) bankGoto('closed');
+        else bankPrint('Err: Option Not Found!', 'err');
+        break;
+
+      case 'details':
+        if(n === 1) bankGoto('menu');
+        else if(n === 2 && (bankState.bal_s === 0 || bankState.bal_c === 0)) bankGoto('account_select');
+        else if(n === 0) bankGoto('closed');
+        else bankPrint('Err: Option Not Found!', 'err');
+        break;
+
+      case 'account_select':
+        if(n === 1){ bankState.c = 1; bankGoto('account_confirm_savings'); }
+        else if(n === 2){ bankState.c = 2; bankGoto('account_confirm_current'); }
+        else if(n === 3) bankGoto('menu');
+        else bankPrint('Err: Option Not Found!', 'err');
+        break;
+
+      case 'account_confirm_savings':
+        if(n === 1) bankGoto('deposit_amount_savings');
+        else bankGoto('closed');
+        break;
+
+      case 'account_confirm_current':
+        if(n === 1) bankGoto('deposit_amount_current');
+        else bankGoto('closed');
+        break;
+
+      case 'deposit_amount_savings':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        if(n > 5000){ bankState.bal_s += n; bankGoto('show'); }
+        else { bankPrint('Minimum balance should be GREATER than 5000.', 'err'); bankGoto('closed'); }
+        break;
+
+      case 'deposit_amount_current':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        if(n > 15000){ bankState.bal_c += n; bankGoto('show'); }
+        else { bankPrint('Minimum balance should be GREATER than 15000.', 'err'); bankGoto('closed'); }
+        break;
+
+      case 'deposit_select':
+        if(n === 1) bankGoto('deposit_amount_general_savings');
+        else if(n === 2) bankGoto('deposit_amount_general_current');
+        else if(n === 3) bankGoto('menu');
+        else { bankPrint('Err: Option Not Found!', 'err'); bankGoto('closed'); }
+        break;
+
+      case 'deposit_amount_general_savings':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        bankState.bal_s += n;
+        bankGoto('show');
+        break;
+
+      case 'deposit_amount_general_current':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        bankState.bal_c += n;
+        bankGoto('show');
+        break;
+
+      case 'withdraw_select':
+        if(n === 1) bankGoto('withdraw_amount_savings');
+        else if(n === 2) bankGoto('withdraw_amount_current');
+        else if(n === 3) bankGoto('menu');
+        else { bankPrint('Err: Option Not Found!', 'err'); bankGoto('closed'); }
+        break;
+
+      case 'withdraw_amount_savings':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        bankState.bal_s -= n;
+        if(bankState.bal_s <= 0){
+          bankPrint('Your balance is less than minimum amount (i.e. Rs.5000).', 'err');
+          bankPrint('Withdrawal is not possible.', 'err');
+          bankGoto('closed');
+        } else {
+          bankGoto('show');
+        }
+        break;
+
+      case 'withdraw_amount_current':
+        if(isNaN(n)){ bankPrint('please enter a number', 'err'); break; }
+        bankState.bal_c -= n;
+        if(bankState.bal_c <= 0){
+          bankPrint('Your balance is less than minimum amount (i.e. Rs.15000).', 'err');
+          bankPrint('Withdrawal is not possible.', 'err');
+          bankGoto('closed');
+        } else {
+          bankGoto('show');
+        }
+        break;
+
+      case 'show':
+        if(n === 1) bankGoto('menu');
+        else if(n === 0) bankGoto('closed');
+        else bankPrint('Err: Option Not Found!', 'err');
+        break;
+
+      case 'closed':
+        bankPrint('session ended — click ↻ to restart', 'err');
+        break;
+    }
+  }
+
+  function bankRestart(){
+    bankState.bal_s = 0;
+    bankState.bal_c = 0;
+    bankState.c = 0;
+    bankOut.innerHTML = '';
+    bankPrint('Welcome Mr. Habeeb Ahmad.');
+    bankGoto('menu');
   }
 
   if(bankInput){
@@ -734,54 +897,208 @@
       if(e.key === 'Enter'){
         const val = bankInput.value;
         if(val.trim().length){
-          bankPrint(val, 'cmd-echo');
-          handleBankCommand(val);
+          const echo = document.createElement('p');
+          echo.className = 'cmd-echo';
+          echo.textContent = val;
+          bankOut.appendChild(echo);
+          bankHandleInput(val);
         }
         bankInput.value = '';
       }
     });
+    bankRestart();
   }
 
-  /* ---------- Mood Music Recommender ---------- */
-  const playlists = {
-    happy: ['"Walking on Sunshine" — Katrina & The Waves', '"Good as Hell" — Lizzo', '"Sunroof" — Nicky Youre'],
-    chill: ['"Sunset Lover" — Petit Biscuit', '"Circles" — Post Malone', '"Redbone" — Childish Gambino'],
-    hype: ['"Stronger" — Kanye West', '"Titanium" — David Guetta ft. Sia', '"Power" — Kanye West'],
-    focus: ['"Weightless" — Marconi Union', '"Intro" — The xx', '"Experience" — Ludovico Einaudi'],
-    heartbroken: ['"Someone Like You" — Adele', '"Liability" — Lorde', '"All I Want" — Kodaline']
+  /* ---------- Mood Music Recommender (faithful port of mood_music.py) ---------- */
+  const playlist = {
+    happy: [
+      ["Happy - Pharrell Williams 🎶", "https://music.youtube.com/watch?v=ZbZSe6N_BXs"],
+      ["Can't Stop the Feeling - Justin Timberlake 😄", "https://music.youtube.com/watch?v=ru0K8uYEZWw"],
+      ["Uptown Funk - Bruno Mars 🎤", "https://music.youtube.com/watch?v=OPf0YbXqDm0"]
+    ],
+    romantic: [
+      ["Someone Like You - Adele 😢", "https://music.youtube.com/watch?v=hLQl3WQQoQ0"],
+      ["Fix You - Coldplay 💔", "https://music.youtube.com/watch?v=k4V3Mo61fJM"],
+      ["The Night We Met - Lord Huron 🌙", "https://music.youtube.com/watch?v=KtlgYxa6BMU"]
+    ],
+    nostalgic: [
+      ["Perfect - Ed Sheeran ❤️", "https://music.youtube.com/watch?v=2Vv-BfVoq4g"],
+      ["All of Me - John Legend 💖", "https://music.youtube.com/watch?v=450p7goxZqg"],
+      ["Thinking Out Loud - Ed Sheeran 💞", "https://music.youtube.com/watch?v=lp-EO5I60KA"]
+    ],
+    energetic: [
+      ["Eye of the Tiger - Survivor 🐯", "https://music.youtube.com/watch?v=btPJPFnesV4"],
+      ["Stronger - Kanye West 💪", "https://music.youtube.com/watch?v=AO1iITF09OE"],
+      ["Don't Stop Me Now - Queen ⚡", "https://music.youtube.com/watch?v=HgzGwKwLmgM"]
+    ],
+    sad: [
+      ["Let Her Go - Passenger 😔", "https://music.youtube.com/watch?v=RBumgq5yVrA"],
+      ["When I Was Your Man - Bruno Mars 💔", "https://music.youtube.com/watch?v=ekzHIouo8Q4"],
+      ["Jealous - Labrinth 😢", "https://music.youtube.com/watch?v=50VWOBi0VFs"]
+    ]
   };
-  function recommendMood(mood){
-    const list = playlists[mood];
-    const pick = list[Math.floor(Math.random() * list.length)];
-    document.getElementById('moodResult').innerHTML = `🎵 for a <strong>${mood}</strong> mood, recommending: <strong>${pick}</strong>`;
+
+  // approximates the nlptown BERT star-rating model with a keyword score.
+  // like the original script, "romantic" isn't reachable through auto-detection —
+  // that mapping gap is a known limitation of the real project too.
+  const posWords = ['happy', 'great', 'good', 'amazing', 'glad', 'fun', 'awesome', 'wonderful', 'joy', 'excited', 'hyped', 'pumped', 'love it'];
+  const negWords = ['sad', 'tired', 'exhausted', 'down', 'depressed', 'bad', 'upset', 'lonely', 'hurt', 'cry', 'broken', 'drained', 'awful'];
+
+  function detectMood(text){
+    const t = text.toLowerCase();
+    let score = 0;
+    posWords.forEach(w => { if(t.includes(w)) score++; });
+    negWords.forEach(w => { if(t.includes(w)) score--; });
+    // approximate 1-5 star mapping
+    let stars;
+    if(score <= -2) stars = 1;
+    else if(score === -1) stars = 2;
+    else if(score === 0) stars = 3;
+    else if(score === 1) stars = 4;
+    else stars = 5;
+
+    if(stars <= 2) return 'sad';
+    if(stars === 3) return 'nostalgic';
+    if(stars === 4) return 'happy';
+    return 'energetic';
   }
 
-  /* ---------- GUI Calculator ---------- */
-  let calcExpr = '';
-  function calcPress(val){
-    const display = document.getElementById('calcDisplay');
-    if(val === 'C'){
-      calcExpr = '';
-    } else if(val === '⌫'){
-      calcExpr = calcExpr.slice(0, -1);
-    } else if(val === '='){
-      try{
-        if(!/^[0-9+\-*/.%()\s]+$/.test(calcExpr) || calcExpr.trim() === '') throw new Error('invalid');
-        const result = Function('"use strict"; return (' + calcExpr + ')')();
-        if(typeof result !== 'number' || !isFinite(result)) throw new Error('invalid');
-        calcExpr = String(Math.round(result * 1e8) / 1e8);
-      } catch(e){
-        calcExpr = 'error';
-      }
-    } else {
-      if(calcExpr === 'error') calcExpr = '';
-      calcExpr += val;
-    }
-    display.value = calcExpr === '' ? '0' : calcExpr;
+  const moodOut = document.getElementById('moodOut');
+  const moodInput = document.getElementById('moodInput');
+  const moodState = { stage: 'awaiting_feeling', songs: [] };
+
+  function moodPrint(text, cls){
+    const p = document.createElement('p');
+    if(cls) p.className = cls;
+    p.textContent = text;
+    moodOut.appendChild(p);
+    moodOut.scrollTop = moodOut.scrollHeight;
   }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function moodHandleInput(raw){
+    const val = raw.trim();
+    if(moodState.stage === 'awaiting_feeling'){
+      const mood = detectMood(val);
+      moodState.songs = shuffle(playlist[mood]);
+      moodPrint(`🎧 Looks like you're feeling ${mood}! Here's your playlist:`, 'ok');
+      moodState.songs.forEach((song, i) => moodPrint(`${i + 1}. ${song[0]}`));
+      moodPrint('Enter the number of the song to play:');
+      moodState.stage = 'awaiting_choice';
+    } else {
+      const choice = parseInt(val, 10);
+      if(choice >= 1 && choice <= moodState.songs.length){
+        const [name, url] = moodState.songs[choice - 1];
+        window.open(url, '_blank', 'noopener');
+        moodPrint(`▶ opening "${name}" in a new tab`, 'ok');
+      } else {
+        moodPrint('❌ Invalid choice.', 'err');
+      }
+      moodPrint('type another feeling to try again');
+      moodState.stage = 'awaiting_feeling';
+    }
+  }
+
+  function moodRestart(){
+    moodOut.innerHTML = '';
+    moodState.stage = 'awaiting_feeling';
+    moodState.songs = [];
+    moodPrint('How are you feeling today?');
+  }
+
+  if(moodInput){
+    moodInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        const val = moodInput.value;
+        if(val.trim().length){
+          const echo = document.createElement('p');
+          echo.className = 'cmd-echo';
+          echo.textContent = val;
+          moodOut.appendChild(echo);
+          moodHandleInput(val);
+        }
+        moodInput.value = '';
+      }
+    });
+    moodRestart();
+  }
+
+  /* ---------- GUI Calculator (faithful port of calculator.py) ---------- */
+  const calcState = { raw: '' };
+
+  function calcRefresh(){
+    const display = document.getElementById('calcDisplay');
+    if(display) display.value = calcState.raw;
+  }
+
+  function calcAppend(ch){
+    calcState.raw += ch;
+    calcRefresh();
+  }
+
+  function calcClear(){
+    calcState.raw = '';
+    calcRefresh();
+  }
+
+  // mirrors Python's float(): strict, throws on anything not a clean number
+  function pyFloat(s){
+    const trimmed = (s || '').trim();
+    if(trimmed === '' || isNaN(Number(trimmed))) throw new Error('ValueError');
+    return Number(trimmed);
+  }
+
+  function calcEquals(){
+    const equation = calcState.raw;
+    let result;
+    try{
+      if(equation.includes('+')){
+        const parts = equation.split('+');
+        result = pyFloat(parts[0]) + pyFloat(parts[1]);
+      } else if(equation.includes('-')){
+        const parts = equation.split('-');
+        result = pyFloat(parts[0]) - pyFloat(parts[1]);
+      } else if(equation.includes('*')){
+        const parts = equation.split('*');
+        result = pyFloat(parts[0]) * pyFloat(parts[1]);
+      } else if(equation.includes('/')){
+        const parts = equation.split('/');
+        const a = pyFloat(parts[0]);
+        const b = pyFloat(parts[1]);
+        result = (b === 0) ? 'Error: Division by zero is not allowed.' : a / b;
+      } else {
+        result = 'Error';
+      }
+      calcState.raw = String(result);
+    } catch(e){
+      calcState.raw = 'Error: Invalid input.';
+    }
+    calcRefresh();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const calcVisible = document.getElementById('demo-calc') && document.getElementById('demo-calc').classList.contains('open');
+    if(!calcVisible) return;
+    if(document.activeElement && (document.activeElement.id === 'bankInput' || document.activeElement.id === 'moodInput')) return;
+    if(/^[0-9]$/.test(e.key) || ['+', '-', '*', '/', '.'].includes(e.key)){
+      calcAppend(e.key);
+    } else if(e.key === 'Enter'){
+      calcEquals();
+    } else if(e.key === 'Backspace'){
+      calcClear();
+    }
+  });
 
   /* ---------- Hangman ---------- */
-  const hangWords = ['integral', 'compiler', 'function', 'keyboard', 'variable', 'terminal', 'pointer', 'console', 'algorithm', 'debug'];
+  const hangWords = ['really', 'swift', 'help', 'programming', 'language'];
   let hangWord = '';
   let hangGuessed = new Set();
   let hangWrong = 0;
@@ -816,7 +1133,7 @@
   }
 
   function hangRender(){
-    const wordDisplay = hangWord.split('').map(ch => hangGuessed.has(ch) ? ch : '_').join(' ');
+    const wordDisplay = hangWord.split('').map(ch => hangGuessed.has(ch) ? ch.toUpperCase() : '_').join(' ');
     document.getElementById('hangWord').textContent = wordDisplay;
     const solved = hangWord.split('').every(ch => hangGuessed.has(ch));
     const status = document.getElementById('hangStatus');
@@ -824,8 +1141,8 @@
       status.textContent = '🎉 solved it! click "new word" to play again';
       hangLockKeyboard();
     } else if(hangWrong >= hangMax){
-      document.getElementById('hangWord').textContent = hangWord.split('').join(' ');
-      status.textContent = `💀 out of guesses — the word was "${hangWord}". click "new word" to try again`;
+      document.getElementById('hangWord').textContent = hangWord.toUpperCase().split('').join(' ');
+      status.textContent = `💀 out of guesses — the word was "${hangWord.toUpperCase()}". click "new word" to try again`;
       hangLockKeyboard();
     } else {
       status.textContent = `guesses left: ${hangMax - hangWrong}`;
