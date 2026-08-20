@@ -39,7 +39,6 @@
       linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 32px 100%,
       var(--paper);
     background-attachment:local, local, fixed;
-    opacity:1;
     color:var(--ink);
     font-family:var(--sans);
     line-height:1.5;
@@ -56,7 +55,7 @@
   }
 
   a{color:var(--blue); text-decoration-thickness:1.5px; text-underline-offset:2px;}
-  a:focus-visible, button:focus-visible, .card:focus-visible{
+  a:focus-visible, button:focus-visible, .card:focus-visible, input:focus-visible{
     outline:3px solid var(--blue); outline-offset:2px;
   }
 
@@ -184,39 +183,118 @@
   .lvl-basic{color:#FFD873;}
 
   /* ---------- PROJECTS ---------- */
-  .grid{
-    display:grid; grid-template-columns:repeat(2, 1fr); gap:22px;
-  }
-  @media (max-width:640px){ .grid{grid-template-columns:1fr;} }
+  .proj-list{display:flex; flex-direction:column; gap:22px;}
   .card{
     background:var(--card); border:1.5px solid var(--ink); border-radius:var(--radius);
-    padding:20px 20px 18px; text-decoration:none; color:var(--ink);
-    display:flex; flex-direction:column; gap:10px; position:relative;
+    padding:22px 22px 20px; color:var(--ink);
     box-shadow:5px 5px 0 var(--line);
-    transition:transform .18s ease, box-shadow .18s ease;
   }
-  .card:nth-child(odd){transform:rotate(-0.6deg);}
-  .card:nth-child(even){transform:rotate(0.6deg);}
-  .card:hover, .card:focus-visible{
-    transform:rotate(0deg) translateY(-3px);
-    box-shadow:7px 8px 0 var(--line);
-  }
-  .card.muted{opacity:0.72;}
-  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
-  .card h3{margin:0; font-family:var(--mono); font-size:1.05rem;}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+  .card h3{margin:0; font-family:var(--mono); font-size:1.1rem;}
   .chip{
     font-family:var(--mono); font-size:0.7rem; white-space:nowrap;
     padding:3px 8px; border-radius:20px; border:1px solid var(--line); color:var(--ink-soft);
     background:var(--paper);
   }
-  .card p.desc{margin:0; font-size:0.92rem; color:var(--ink-soft); flex-grow:1;}
+  .card p.desc{margin:10px 0 0; font-size:0.94rem; color:var(--ink-soft);}
   .card-foot{
-    display:flex; justify-content:space-between; align-items:center;
-    font-family:var(--mono); font-size:0.76rem; margin-top:4px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    font-family:var(--mono); font-size:0.76rem; margin-top:16px;
   }
   .status{color:var(--green);}
-  .view-link{color:var(--blue); font-weight:700;}
-  .no-repo{color:var(--ink-faint); font-style:italic;}
+  .card-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .view-link{color:var(--blue); font-weight:700; text-decoration:none;}
+  .view-link:hover{text-decoration:underline;}
+  .run-btn{
+    font-family:var(--mono); font-size:0.76rem; font-weight:700;
+    background:var(--yellow); color:var(--ink); border:1.5px solid var(--ink);
+    padding:7px 14px; border-radius:6px; cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .run-btn:hover{background:var(--ink); color:var(--paper);}
+  .run-btn[aria-expanded="true"]{background:var(--ink); color:var(--paper);}
+
+  .demo-panel{
+    margin-top:16px; padding-top:16px; border-top:1.5px dashed var(--line);
+    display:none;
+  }
+  .demo-panel.open{display:block;}
+  .demo-label{font-family:var(--mono); font-size:0.78rem; color:var(--ink-faint); margin:0 0 10px;}
+
+  /* mini terminal (banking demo) */
+  .mini-term{background:#0F1B2D; border-radius:8px; border:1px solid var(--ink); overflow:hidden;}
+  .mini-term-out{
+    font-family:var(--mono); font-size:0.82rem; color:#D9E4F5;
+    padding:14px 14px 4px; max-height:220px; overflow-y:auto;
+  }
+  .mini-term-out p{margin:0 0 8px;}
+  .mini-term-out .cmd-echo{color:#EAF1FF;}
+  .mini-term-out .cmd-echo::before{content:"$ "; color:var(--green);}
+  .mini-term-out .err{color:#FF8A80;}
+  .mini-term-out .ok{color:#7CDB8A;}
+  .mini-term-input-row{
+    display:flex; align-items:center; gap:8px;
+    border-top:1px solid rgba(255,255,255,0.1); padding:10px 14px;
+  }
+  .mini-term-input-row .prompt{font-family:var(--mono); color:var(--green);}
+  .mini-term-input{
+    flex:1; background:transparent; border:none; outline:none;
+    font-family:var(--mono); font-size:0.85rem; color:#EAF1FF;
+  }
+  .mini-term-input::placeholder{color:#5A6E8C;}
+
+  /* mood demo */
+  .mood-btns{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .mood-btn{
+    font-family:var(--sans); font-size:0.85rem; font-weight:500;
+    background:var(--paper); border:1.5px solid var(--line); border-radius:20px;
+    padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .1s ease;
+  }
+  .mood-btn:hover{border-color:var(--blue); transform:translateY(-1px);}
+  .mood-result{
+    font-family:var(--mono); font-size:0.88rem; background:var(--paper);
+    border:1px dashed var(--line); border-radius:8px; padding:14px 16px; color:var(--ink-soft);
+  }
+  .mood-result strong{color:var(--ink);}
+
+  /* calculator demo */
+  .calc-widget{max-width:280px;}
+  .calc-display{
+    width:100%; font-family:var(--mono); font-size:1.4rem; text-align:right;
+    background:#0F1B2D; color:#EAF1FF; border:1px solid var(--ink); border-radius:8px 8px 0 0;
+    padding:14px 16px; box-sizing:border-box;
+  }
+  .calc-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--ink); border-top:none; border-radius:0 0 8px 8px; overflow:hidden;
+  }
+  .calc-grid button{
+    font-family:var(--mono); font-size:1rem; padding:14px 0; border:none;
+    background:var(--card); color:var(--ink); cursor:pointer; transition:background .12s ease;
+  }
+  .calc-grid button:hover{background:var(--paper);}
+  .calc-grid button.op{color:var(--blue); font-weight:700;}
+  .calc-grid button.eq{background:var(--yellow); font-weight:700; grid-row:span 2;}
+  .calc-grid button.zero{grid-column:span 2;}
+  .calc-grid button.clear{color:#D14343; font-weight:700;}
+
+  /* hangman demo */
+  .hangman-widget{max-width:420px;}
+  .hangman-word{
+    font-family:var(--mono); font-size:1.6rem; letter-spacing:6px;
+    margin:0 0 10px; color:var(--ink);
+  }
+  .hangman-status{font-family:var(--mono); font-size:0.85rem; color:var(--ink-soft); margin:0 0 14px;}
+  .hangman-keyboard{display:grid; grid-template-columns:repeat(9, 1fr); gap:6px; margin-bottom:14px;}
+  .hangman-keyboard button{
+    font-family:var(--mono); font-size:0.82rem; padding:8px 0;
+    border:1px solid var(--line); border-radius:5px; background:var(--paper);
+    color:var(--ink); cursor:pointer; text-transform:uppercase;
+  }
+  .hangman-keyboard button:hover:not(:disabled){border-color:var(--blue);}
+  .hangman-keyboard button:disabled{opacity:0.35; cursor:default;}
+  .hangman-keyboard button.correct{background:#DCF3E1; border-color:var(--green); color:var(--green);}
+  .hangman-keyboard button.wrong{background:#FBE1DE; border-color:#D14343; color:#D14343;}
 
   /* ---------- BUILD LOG (git log timeline) ---------- */
   .log{border-left:2.5px solid var(--line); margin-left:6px; padding-left:26px;}
@@ -251,6 +329,11 @@
     font-family:var(--mono); font-size:0.78rem; color:var(--ink-faint);
   }
   footer .hand{font-family:var(--hand); font-size:1.1rem; color:var(--blue);}
+
+  @media (max-width:480px){
+    .calc-widget{max-width:100%;}
+    .hangman-keyboard{grid-template-columns:repeat(7, 1fr);}
+  }
 </style>
 </head>
 <body>
@@ -330,56 +413,131 @@
       <span class="sec-tag">03</span>
       <h2 class="sec-title">experiments log</h2>
     </div>
-    <div class="sec-note">things I built to see if I could</div>
-    <div class="grid">
+    <div class="sec-note">things I built to see if I could — try them right here</div>
+    <div class="proj-list">
 
-      <a class="card" href="https://github.com/Habeebz-td/Banking-Management-System" target="_blank" rel="noopener">
+      <!-- Banking Management System -->
+      <div class="card">
         <div class="card-top">
           <h3>Banking Management System</h3>
           <span class="chip">C</span>
         </div>
-        <p class="desc">Console-based system with account creation, deposits, withdrawals, and balance checks — built with file handling so the data survives after you close the terminal.</p>
+        <p class="desc">Console-based system with account creation, deposits, withdrawals, and balance checks — built with file handling so the data survives after you close the terminal. This is a live browser port of the same command logic.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
-          <span class="view-link">view source →</span>
+          <div class="card-actions">
+            <button class="run-btn" onclick="toggleDemo('demo-banking', this)" aria-expanded="false">▶ run it</button>
+            <a class="view-link" href="https://github.com/Habeebz-td/Banking-Management-System" target="_blank" rel="noopener">view source →</a>
+          </div>
         </div>
-      </a>
+        <div class="demo-panel" id="demo-banking">
+          <p class="demo-label">type a command below — try: help</p>
+          <div class="mini-term">
+            <div class="mini-term-out" id="bankOut">
+              <p>Banking Management System — browser edition</p>
+              <p>type <b>help</b> to see available commands</p>
+            </div>
+            <div class="mini-term-input-row">
+              <span class="prompt">$</span>
+              <input type="text" id="bankInput" class="mini-term-input" placeholder="create Habeeb" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <a class="card" href="https://github.com/Habeebz-td/Mood-Music-Recommender" target="_blank" rel="noopener">
+      <!-- Mood Music Recommender -->
+      <div class="card">
         <div class="card-top">
           <h3>Mood Music Recommender</h3>
           <span class="chip">Python</span>
         </div>
-        <p class="desc">A semi-smart script that recommends songs from a playlist based on your mood. Not quite AI, but it has opinions.</p>
+        <p class="desc">A semi-smart script that recommends songs from a playlist based on your mood. Not quite AI, but it has opinions. Rebuilt here with the same rule-based logic.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
-          <span class="view-link">view source →</span>
+          <div class="card-actions">
+            <button class="run-btn" onclick="toggleDemo('demo-mood', this)" aria-expanded="false">▶ run it</button>
+            <a class="view-link" href="https://github.com/Habeebz-td/Mood-Music-Recommender" target="_blank" rel="noopener">view source →</a>
+          </div>
         </div>
-      </a>
+        <div class="demo-panel" id="demo-mood">
+          <p class="demo-label">pick a mood:</p>
+          <div class="mood-btns">
+            <button class="mood-btn" onclick="recommendMood('happy')">😊 happy</button>
+            <button class="mood-btn" onclick="recommendMood('chill')">🌊 chill</button>
+            <button class="mood-btn" onclick="recommendMood('hype')">🔥 hype</button>
+            <button class="mood-btn" onclick="recommendMood('focus')">🎯 focus</button>
+            <button class="mood-btn" onclick="recommendMood('heartbroken')">💔 heartbroken</button>
+          </div>
+          <div class="mood-result" id="moodResult">choose a mood above and I'll recommend something — click again for another pick</div>
+        </div>
+      </div>
 
-      <a class="card" href="https://github.com/Habeebz-td/Calculator" target="_blank" rel="noopener">
+      <!-- GUI Calculator -->
+      <div class="card">
         <div class="card-top">
           <h3>GUI Calculator</h3>
           <span class="chip">Python · Tkinter</span>
         </div>
-        <p class="desc">My first project with an actual visual interface instead of a blinking cursor. Buttons that click and numbers that add up.</p>
+        <p class="desc">My first project with an actual visual interface instead of a blinking cursor. Buttons that click and numbers that add up — same layout, running in HTML/CSS/JS here.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
-          <span class="view-link">view source →</span>
+          <div class="card-actions">
+            <button class="run-btn" onclick="toggleDemo('demo-calc', this)" aria-expanded="false">▶ run it</button>
+            <a class="view-link" href="https://github.com/Habeebz-td/Calculator" target="_blank" rel="noopener">view source →</a>
+          </div>
         </div>
-      </a>
+        <div class="demo-panel" id="demo-calc">
+          <div class="calc-widget">
+            <input type="text" id="calcDisplay" class="calc-display" readonly value="0" aria-label="calculator display">
+            <div class="calc-grid">
+              <button class="clear" onclick="calcPress('C')">C</button>
+              <button onclick="calcPress('⌫')">⌫</button>
+              <button class="op" onclick="calcPress('%')">%</button>
+              <button class="op" onclick="calcPress('/')">÷</button>
+              <button onclick="calcPress('7')">7</button>
+              <button onclick="calcPress('8')">8</button>
+              <button onclick="calcPress('9')">9</button>
+              <button class="op" onclick="calcPress('*')">×</button>
+              <button onclick="calcPress('4')">4</button>
+              <button onclick="calcPress('5')">5</button>
+              <button onclick="calcPress('6')">6</button>
+              <button class="op" onclick="calcPress('-')">−</button>
+              <button onclick="calcPress('1')">1</button>
+              <button onclick="calcPress('2')">2</button>
+              <button onclick="calcPress('3')">3</button>
+              <button class="op" onclick="calcPress('+')">+</button>
+              <button class="zero" onclick="calcPress('0')">0</button>
+              <button onclick="calcPress('.')">.</button>
+              <button class="eq" onclick="calcPress('=')">=</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <a class="card" href="https://github.com/Habeebz-td/Hangman" target="_blank" rel="noopener">
+      <!-- Hangman -->
+      <div class="card">
         <div class="card-top">
           <h3>Hangman</h3>
           <span class="chip">Swift</span>
         </div>
-        <p class="desc">A fully playable word-guessing game with letter tracking and win/loss logic. No mercy for wrong guesses.</p>
+        <p class="desc">A fully playable word-guessing game with letter tracking and win/loss logic. No mercy for wrong guesses — same rules, playable right here.</p>
         <div class="card-foot">
           <span class="status">● compiled</span>
-          <span class="view-link">view source →</span>
+          <div class="card-actions">
+            <button class="run-btn" onclick="toggleDemo('demo-hangman', this)" aria-expanded="false">▶ run it</button>
+            <a class="view-link" href="https://github.com/Habeebz-td/Hangman" target="_blank" rel="noopener">view source →</a>
+          </div>
         </div>
-      </a>
+        <div class="demo-panel" id="demo-hangman">
+          <div class="hangman-widget">
+            <p class="hangman-word" id="hangWord">_ _ _ _</p>
+            <p class="hangman-status" id="hangStatus">guesses left: 6</p>
+            <div class="hangman-keyboard" id="hangKeyboard"></div>
+            <button class="run-btn" onclick="hangNewGame()">↻ new word</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -393,7 +551,7 @@
       <div class="log-item">
         <div class="log-meta"><span class="hash">#a1f9c02</span> · 2020</div>
         <p class="log-title">Completed Game Development certification</p>
-        <p class="log-sub">WhiteHat Jr. — first taste of building playable things, including Ping Pong.</p>
+        <p class="log-sub">WhiteHat Jr. — first taste of building playable things.</p>
       </div>
       <div class="log-item">
         <div class="log-meta"><span class="hash">#b7e2d15</span> · 2022</div>
@@ -449,12 +607,12 @@
 </footer>
 
 <script>
+  /* ---------- hero typing ---------- */
   const lines = [
     { cmd: "whoami", out: "Habeeb Ahmad — CSE student, Integral University, Lucknow" },
     { cmd: "cat interests.txt", out: "building things → breaking things → fixing what I broke → repeat" },
     { cmd: "./compile life.c", out: "compiling... linking... done ✅  ready to ship" }
   ];
-
   const container = document.getElementById('termBody');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -471,7 +629,6 @@
       container.appendChild(p2);
     });
   }
-
   function typeSequence(){
     let li = 0;
     function typeLine(){
@@ -490,7 +647,6 @@
       cursor.className = 'cursor';
       p1.appendChild(cursor);
       container.appendChild(p1);
-
       let ci = 0;
       const typer = setInterval(() => {
         cmdSpan.textContent += cmd[ci];
@@ -509,11 +665,184 @@
     }
     typeLine();
   }
+  if(reduceMotion){ renderStatic(); } else { typeSequence(); }
 
-  if(reduceMotion){
-    renderStatic();
-  } else {
-    typeSequence();
+  /* ---------- demo panel toggling ---------- */
+  function toggleDemo(id, btn){
+    const panel = document.getElementById(id);
+    const isOpen = panel.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    btn.textContent = isOpen ? '▲ close' : '▶ run it';
+    if(isOpen && id === 'demo-hangman' && !hangInitialized){ hangNewGame(); }
+  }
+
+  /* ---------- Banking Management System (browser port) ---------- */
+  const bankState = { accounts: {}, active: null };
+  const bankOut = document.getElementById('bankOut');
+  const bankInput = document.getElementById('bankInput');
+
+  function bankPrint(text, cls){
+    const p = document.createElement('p');
+    if(cls) p.className = cls;
+    p.textContent = text;
+    bankOut.appendChild(p);
+    bankOut.scrollTop = bankOut.scrollHeight;
+  }
+
+  function handleBankCommand(raw){
+    const tokens = raw.trim().split(/\s+/).filter(Boolean);
+    if(tokens.length === 0) return;
+    const cmd = tokens[0].toLowerCase();
+
+    if(cmd === 'help'){
+      bankPrint('commands: create <name> · deposit <amount> · withdraw <amount> · balance · accounts · clear');
+    } else if(cmd === 'create'){
+      const name = tokens[1];
+      if(!name){ bankPrint('usage: create <name>', 'err'); return; }
+      if(!(name in bankState.accounts)) bankState.accounts[name] = 0;
+      bankState.active = name;
+      bankPrint(`account "${name}" ready — active account. balance: ₹${bankState.accounts[name]}`, 'ok');
+    } else if(cmd === 'deposit'){
+      const amount = parseFloat(tokens[1]);
+      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
+      if(isNaN(amount) || amount <= 0){ bankPrint('usage: deposit <positive amount>', 'err'); return; }
+      bankState.accounts[bankState.active] += amount;
+      bankPrint(`deposited ₹${amount}. new balance: ₹${bankState.accounts[bankState.active]}`, 'ok');
+    } else if(cmd === 'withdraw'){
+      const amount = parseFloat(tokens[1]);
+      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
+      if(isNaN(amount) || amount <= 0){ bankPrint('usage: withdraw <positive amount>', 'err'); return; }
+      if(amount > bankState.accounts[bankState.active]){ bankPrint('insufficient balance', 'err'); return; }
+      bankState.accounts[bankState.active] -= amount;
+      bankPrint(`withdrew ₹${amount}. new balance: ₹${bankState.accounts[bankState.active]}`, 'ok');
+    } else if(cmd === 'balance'){
+      if(!bankState.active){ bankPrint('no active account — try: create <name>', 'err'); return; }
+      bankPrint(`${bankState.active}: ₹${bankState.accounts[bankState.active]}`);
+    } else if(cmd === 'accounts'){
+      const names = Object.keys(bankState.accounts);
+      if(names.length === 0){ bankPrint('no accounts yet — try: create <name>'); return; }
+      names.forEach(n => bankPrint(`${n}: ₹${bankState.accounts[n]}${n===bankState.active ? '  (active)' : ''}`));
+    } else if(cmd === 'clear'){
+      bankOut.innerHTML = '';
+    } else {
+      bankPrint(`command not found: ${cmd} (try: help)`, 'err');
+    }
+  }
+
+  if(bankInput){
+    bankInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        const val = bankInput.value;
+        if(val.trim().length){
+          bankPrint(val, 'cmd-echo');
+          handleBankCommand(val);
+        }
+        bankInput.value = '';
+      }
+    });
+  }
+
+  /* ---------- Mood Music Recommender ---------- */
+  const playlists = {
+    happy: ['"Walking on Sunshine" — Katrina & The Waves', '"Good as Hell" — Lizzo', '"Sunroof" — Nicky Youre'],
+    chill: ['"Sunset Lover" — Petit Biscuit', '"Circles" — Post Malone', '"Redbone" — Childish Gambino'],
+    hype: ['"Stronger" — Kanye West', '"Titanium" — David Guetta ft. Sia', '"Power" — Kanye West'],
+    focus: ['"Weightless" — Marconi Union', '"Intro" — The xx', '"Experience" — Ludovico Einaudi'],
+    heartbroken: ['"Someone Like You" — Adele', '"Liability" — Lorde', '"All I Want" — Kodaline']
+  };
+  function recommendMood(mood){
+    const list = playlists[mood];
+    const pick = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('moodResult').innerHTML = `🎵 for a <strong>${mood}</strong> mood, recommending: <strong>${pick}</strong>`;
+  }
+
+  /* ---------- GUI Calculator ---------- */
+  let calcExpr = '';
+  function calcPress(val){
+    const display = document.getElementById('calcDisplay');
+    if(val === 'C'){
+      calcExpr = '';
+    } else if(val === '⌫'){
+      calcExpr = calcExpr.slice(0, -1);
+    } else if(val === '='){
+      try{
+        if(!/^[0-9+\-*/.%()\s]+$/.test(calcExpr) || calcExpr.trim() === '') throw new Error('invalid');
+        const result = Function('"use strict"; return (' + calcExpr + ')')();
+        if(typeof result !== 'number' || !isFinite(result)) throw new Error('invalid');
+        calcExpr = String(Math.round(result * 1e8) / 1e8);
+      } catch(e){
+        calcExpr = 'error';
+      }
+    } else {
+      if(calcExpr === 'error') calcExpr = '';
+      calcExpr += val;
+    }
+    display.value = calcExpr === '' ? '0' : calcExpr;
+  }
+
+  /* ---------- Hangman ---------- */
+  const hangWords = ['integral', 'compiler', 'function', 'keyboard', 'variable', 'terminal', 'pointer', 'console', 'algorithm', 'debug'];
+  let hangWord = '';
+  let hangGuessed = new Set();
+  let hangWrong = 0;
+  const hangMax = 6;
+  let hangInitialized = false;
+
+  function hangBuildKeyboard(){
+    const kb = document.getElementById('hangKeyboard');
+    kb.innerHTML = '';
+    for(let i = 97; i <= 122; i++){
+      const letter = String.fromCharCode(i);
+      const btn = document.createElement('button');
+      btn.textContent = letter;
+      btn.id = 'hk-' + letter;
+      btn.onclick = () => hangGuess(letter);
+      kb.appendChild(btn);
+    }
+  }
+
+  function hangGuess(letter){
+    if(hangGuessed.has(letter)) return;
+    hangGuessed.add(letter);
+    const btn = document.getElementById('hk-' + letter);
+    if(hangWord.includes(letter)){
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+      hangWrong++;
+    }
+    btn.disabled = true;
+    hangRender();
+  }
+
+  function hangRender(){
+    const wordDisplay = hangWord.split('').map(ch => hangGuessed.has(ch) ? ch : '_').join(' ');
+    document.getElementById('hangWord').textContent = wordDisplay;
+    const solved = hangWord.split('').every(ch => hangGuessed.has(ch));
+    const status = document.getElementById('hangStatus');
+    if(solved){
+      status.textContent = '🎉 solved it! click "new word" to play again';
+      hangLockKeyboard();
+    } else if(hangWrong >= hangMax){
+      document.getElementById('hangWord').textContent = hangWord.split('').join(' ');
+      status.textContent = `💀 out of guesses — the word was "${hangWord}". click "new word" to try again`;
+      hangLockKeyboard();
+    } else {
+      status.textContent = `guesses left: ${hangMax - hangWrong}`;
+    }
+  }
+
+  function hangLockKeyboard(){
+    document.querySelectorAll('.hangman-keyboard button').forEach(b => b.disabled = true);
+  }
+
+  function hangNewGame(){
+    hangInitialized = true;
+    hangWord = hangWords[Math.floor(Math.random() * hangWords.length)];
+    hangGuessed = new Set();
+    hangWrong = 0;
+    hangBuildKeyboard();
+    hangRender();
   }
 </script>
 
