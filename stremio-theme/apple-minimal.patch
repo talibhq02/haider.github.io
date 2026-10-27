@@ -550,10 +550,10 @@ index ee3d1ea..5c98eac 100644
                              <MetaRow
 diff --git a/src/routes/Board/Hero/Hero.js b/src/routes/Board/Hero/Hero.js
 new file mode 100644
-index 0000000..4cba080
+index 0000000..7e533f1
 --- /dev/null
 +++ b/src/routes/Board/Hero/Hero.js
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,158 @@
 +// Copyright (C) 2017-2023 Smart code 203358507
 +
 +const React = require('react');
@@ -566,6 +566,7 @@ index 0000000..4cba080
 +
 +const MAX_ITEMS = 6;
 +const ROTATE_INTERVAL = 8000;
++const SWIPE_THRESHOLD = 50;
 +
 +const metahubUrl = (kind, id) => `https://images.metahub.space/${kind}/large/${id}/img`;
 +
@@ -598,6 +599,32 @@ index 0000000..4cba080
 +        return () => clearTimeout(timeout);
 +    }, [items.length, selectedIndex]);
 +
++    const goTo = React.useCallback((nextIndex) => {
++        if (items.length > 0) {
++            setIndex((nextIndex + items.length) % items.length);
++        }
++    }, [items.length]);
++
++    // Horizontal swipes switch titles; vertical ones still scroll the board
++    const touchStartRef = React.useRef(null);
++    const onTouchStart = React.useCallback((event) => {
++        const touch = event.touches[0];
++        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
++    }, []);
++    const onTouchEnd = React.useCallback((event) => {
++        if (touchStartRef.current === null) {
++            return;
++        }
++
++        const touch = event.changedTouches[0];
++        const deltaX = touch.clientX - touchStartRef.current.x;
++        const deltaY = touch.clientY - touchStartRef.current.y;
++        touchStartRef.current = null;
++        if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
++            goTo(selectedIndex + (deltaX < 0 ? 1 : -1));
++        }
++    }, [goTo, selectedIndex]);
++
 +    const renderTitle = React.useCallback(() => (
 +        <div className={styles['title']}>{item ? item.name : ''}</div>
 +    ), [item]);
@@ -613,7 +640,7 @@ index 0000000..4cba080
 +        .join('  ·  ');
 +
 +    return (
-+        <div className={classnames(className, styles['hero-container'])}>
++        <div className={classnames(className, styles['hero-container'])} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
 +            {items.map((heroItem, heroIndex) => (
 +                <Image
 +                    key={heroItem.id}
@@ -650,12 +677,25 @@ index 0000000..4cba080
 +            </div>
 +            {
 +                items.length > 1 ?
++                    <React.Fragment>
++                        <div className={classnames(styles['arrow'], styles['prev'])} onClick={() => goTo(selectedIndex - 1)}>
++                            <Icon className={styles['icon']} name={'chevron-back'} />
++                        </div>
++                        <div className={classnames(styles['arrow'], styles['next'])} onClick={() => goTo(selectedIndex + 1)}>
++                            <Icon className={styles['icon']} name={'chevron-forward'} />
++                        </div>
++                    </React.Fragment>
++                    :
++                    null
++            }
++            {
++                items.length > 1 ?
 +                    <div className={styles['dots']}>
 +                        {items.map((heroItem, heroIndex) => (
 +                            <div
 +                                key={heroItem.id}
 +                                className={classnames(styles['dot'], { [styles['active']]: heroIndex === selectedIndex })}
-+                                onClick={() => setIndex(heroIndex)}
++                                onClick={() => goTo(heroIndex)}
 +                            />
 +                        ))}
 +                    </div>
@@ -685,10 +725,10 @@ index 0000000..a1c6b9c
 +module.exports = Hero;
 diff --git a/src/routes/Board/Hero/styles.less b/src/routes/Board/Hero/styles.less
 new file mode 100644
-index 0000000..8f630b3
+index 0000000..48894ec
 --- /dev/null
 +++ b/src/routes/Board/Hero/styles.less
-@@ -0,0 +1,188 @@
+@@ -0,0 +1,238 @@
 +// Copyright (C) 2017-2024 Smart code 203358507
 +
 +@import (reference) '~stremio/common/screen-sizes.less';
@@ -701,6 +741,7 @@ index 0000000..8f630b3
 +    align-items: flex-end;
 +    height: clamp(26rem, 72vh, 54rem);
 +    margin: 0 -1rem 0.5rem;
++    touch-action: pan-y;
 +
 +    .backdrop {
 +        position: absolute;
@@ -807,6 +848,55 @@ index 0000000..8f630b3
 +                outline: none;
 +                background-color: #ffffff;
 +                transform: scale(1.05);
++            }
++        }
++    }
++
++    .arrow {
++        position: absolute;
++        top: 50%;
++        z-index: 2;
++        display: flex;
++        align-items: center;
++        justify-content: center;
++        width: 3rem;
++        height: 3rem;
++        margin-top: -1.5rem;
++        border-radius: 50%;
++        border: 1px solid var(--glass-border);
++        background-color: var(--glass-background);
++        backdrop-filter: var(--glass-blur);
++        -webkit-backdrop-filter: var(--glass-blur);
++        opacity: 0;
++        pointer-events: none;
++        cursor: pointer;
++        transition: opacity 200ms ease-out, transform 200ms ease-out;
++
++        .icon {
++            width: 1.4rem;
++            height: 1.4rem;
++            color: var(--primary-foreground-color);
++        }
++
++        &:hover {
++            transform: scale(1.08);
++        }
++
++        &.prev {
++            left: 1.5rem;
++        }
++
++        &.next {
++            right: 1.5rem;
++        }
++    }
++
++    // Arrows only for mouse users; phones swipe instead
++    @media (pointer: fine) {
++        &:hover {
++            .arrow {
++                opacity: 1;
++                pointer-events: auto;
 +            }
 +        }
 +    }
