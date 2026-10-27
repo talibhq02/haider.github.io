@@ -1,0 +1,81 @@
+name: Build and deploy site
+
+on:
+  push:
+    branches:
+      - main
+      - claude/vibrant-mendel-iucfmc
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Stremio Web commit the theme patch was written against
+  STREMIO_WEB_COMMIT: 8329565d17b75d2af8ba5822aa8059058a5d934e
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v7
+
+      - name: Fetch Stremio Web
+        run: |
+          git init stremio-web
+          cd stremio-web
+          git remote add origin https://github.com/Stremio/stremio-web.git
+          git fetch --depth 1 origin "$STREMIO_WEB_COMMIT"
+          git checkout FETCH_HEAD
+          git apply ../stremio-theme/apple-minimal.patch
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 11.8.0
+          run_install: false
+
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: stremio-web/pnpm-lock.yaml
+
+      - name: Build Stremio
+        working-directory: stremio-web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Assemble site
+        run: |
+          mkdir _site
+          rsync -a --exclude .git --exclude .github --exclude stremio-web --exclude stremio-theme --exclude _site ./ _site/
+          mkdir -p _site/stremio
+          cp -r stremio-web/build/. _site/stremio/
+          touch _site/.nojekyll
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
