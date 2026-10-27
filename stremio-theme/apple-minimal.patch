@@ -1,0 +1,939 @@
+diff --git a/src/App/styles.less b/src/App/styles.less
+index fe6eecd..0d03ee1 100644
+--- a/src/App/styles.less
++++ b/src/App/styles.less
+@@ -48,8 +48,8 @@
+     --landscape-shape-ratio: 0.5625;
+     --poster-shape-ratio: 1.464;
+     --scroll-bar-size: 6px;
+-    --horizontal-nav-bar-size: 5.5rem;
+-    --vertical-nav-bar-size: 6rem;
++    --horizontal-nav-bar-size: 4.5rem;
++    --vertical-nav-bar-size: 4.5rem;
+     --focus-outline-size: 2px;
+     --color-facebook: #1877F1;
+     --color-x: #000000;
+@@ -59,20 +59,23 @@
+     --color-placeholder: #60606080;
+     --color-placeholder-text: @color-surface-50;
+     --color-placeholder-background: @color-surface-dark5-20;
+-    --primary-background-color: rgba(12, 11, 17, 1);
+-    --secondary-background-color: rgba(26, 23, 62, 1);
+-    --primary-foreground-color: rgba(255, 255, 255, 0.9);
++    --primary-background-color: rgba(0, 0, 0, 1);
++    --secondary-background-color: rgba(18, 18, 20, 1);
++    --primary-foreground-color: rgba(255, 255, 255, 0.92);
+     --secondary-foreground-color: rgb(12, 11, 17, 1);
+-    --primary-accent-color: rgb(123, 91, 245);
+-    --secondary-accent-color: rgba(34, 179, 101, 1);
++    --primary-accent-color: rgb(10, 132, 255);
++    --secondary-accent-color: rgba(48, 209, 88, 1);
+     --tertiary-accent-color: rgba(246, 199, 0, 1);
+     --quaternary-accent-color: rgba(18, 69, 166, 1);
+-    --overlay-color: rgba(255, 255, 255, 0.05);
+-    --modal-background-color: rgba(15, 13, 32, 1);
+-    --outer-glow: 0px 0px 15px rgba(123, 91, 245, 0.37);
++    --overlay-color: rgba(255, 255, 255, 0.08);
++    --modal-background-color: rgba(28, 28, 30, 0.96);
++    --outer-glow: 0px 12px 40px rgba(0, 0, 0, 0.55);
+     --warning-accent-color: rgba(255, 165, 0, 1);
+     --danger-accent-color: rgba(220, 38, 38, 1);  
+-    --border-radius: 0.75rem;
++    --border-radius: 1rem;
++    --glass-background: rgba(30, 30, 32, 0.55);
++    --glass-border: rgba(255, 255, 255, 0.08);
++    --glass-blur: saturate(180%) blur(24px);
+     --top-overlay-size: @top-overlay-size;
+     --bottom-overlay-size: @bottom-overlay-size;
+     --overlap-size: @overlap-size;
+@@ -164,7 +167,8 @@ html {
+     zoom: var(--interface-scale);
+     width: @html-width;
+     height: @html-height;
+-    font-family: 'PlusJakartaSans', 'Arial', 'Helvetica', 'TwemojiFlags', 'sans-serif';
++    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Helvetica Neue', 'PlusJakartaSans', 'Arial', 'TwemojiFlags', sans-serif;
++    letter-spacing: -0.01em;
+     color: var(--primary-foreground-color);
+     overflow: auto;
+     overscroll-behavior: none;
+@@ -182,7 +186,7 @@ html {
+     body {
+         width: 100%;
+         height: 100%;
+-        background: linear-gradient(41deg, var(--primary-background-color) 0%, var(--secondary-background-color) 100%);
++        background: radial-gradient(120% 80% at 50% 0%, var(--secondary-background-color) 0%, var(--primary-background-color) 70%);
+         -webkit-font-smoothing: antialiased;
+ 
+         :global(#app) {
+diff --git a/src/components/MainNavBars/MainNavBars.less b/src/components/MainNavBars/MainNavBars.less
+index 25079d7..54be2bb 100644
+--- a/src/components/MainNavBars/MainNavBars.less
++++ b/src/components/MainNavBars/MainNavBars.less
+@@ -19,12 +19,13 @@
+         z-index: 1;
+     }
+ 
++    // Tabs sit centered inside the top bar, like the Apple TV app
+     .vertical-nav-bar {
+         position: absolute;
+-        top: var(--horizontal-nav-bar-size);
+-        bottom: 0;
+-        left: 0;
+-        z-index: 1;
++        top: calc(var(--safe-area-inset-top) + (var(--horizontal-nav-bar-size) - 3rem) / 2);
++        left: 50%;
++        z-index: 2;
++        transform: translateX(-50%);
+     }
+ 
+     .nav-content-container {
+@@ -32,7 +33,7 @@
+         top: calc(var(--horizontal-nav-bar-size) + var(--safe-area-inset-top));
+         right: 0;
+         bottom: 0;
+-        left: var(--vertical-nav-bar-size);
++        left: 0;
+         z-index: 0;
+     }
+ }
+@@ -46,6 +47,10 @@
+ 
+         .vertical-nav-bar {
+             top: initial;
++            right: 0;
++            bottom: 0;
++            left: 0;
++            transform: none;
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/MainNavBars/MainNavBars.tsx b/src/components/MainNavBars/MainNavBars.tsx
+index 1b8037e..b87f135 100644
+--- a/src/components/MainNavBars/MainNavBars.tsx
++++ b/src/components/MainNavBars/MainNavBars.tsx
+@@ -6,13 +6,11 @@ import { VerticalNavBar, HorizontalNavBar } from 'stremio/components/NavBar';
+ import { useContentGamepadNavigation, useVerticalNavGamepadNavigation } from 'stremio/services/GamepadNavigation';
+ import styles from './MainNavBars.less';
+ 
++// Add-ons and Settings live in the profile menu (top right)
+ const TABS = [
+-    { id: 'board', label: 'Board', icon: 'home', href: '/' },
++    { id: 'board', label: 'Home', icon: 'home', href: '/' },
+     { id: 'discover', label: 'Discover', icon: 'discover', href: '/discover' },
+     { id: 'library', label: 'Library', icon: 'library', href: '/library' },
+-    { id: 'calendar', label: 'Calendar', icon: 'calendar', href: '/calendar' },
+-    { id: 'addons', label: 'ADDONS', icon: 'addons', href: '/addons' },
+-    { id: 'settings', label: 'SETTINGS', icon: 'settings', href: '/settings' },
+ ];
+ 
+ type Props = {
+diff --git a/src/components/MetaItem/styles.less b/src/components/MetaItem/styles.less
+index 98e9ac4..4b7d3d4 100644
+--- a/src/components/MetaItem/styles.less
++++ b/src/components/MetaItem/styles.less
+@@ -25,7 +25,8 @@
+         transition: background-color 100ms ease-out;
+ 
+         .poster-container {
+-            box-shadow: 0 0 0 0.2rem var(--primary-foreground-color);
++            transform: scale(1.06);
++            box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.6);
+ 
+             .dismiss-icon-layer {
+                 opacity: 1;
+@@ -33,7 +34,7 @@
+             }
+ 
+             .poster-image-layer {
+-                transform: scale(1.05);
++                transform: none;
+             }
+ 
+             .play-icon-layer {
+@@ -99,7 +100,7 @@
+         z-index: 0;
+         background-color: var(--overlay-color);
+         border-radius: var(--border-radius);
+-        transition: scale 100ms ease-out;
++        transition: scale 100ms ease-out, transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 250ms ease-out;
+ 
+         &:global(.poster-change-cursor) {
+             .poster-image-layer {
+@@ -354,7 +355,7 @@
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+-        height: 4rem;
++        height: 3.25rem;
+         overflow: visible;
+ 
+         &.has-menu {
+@@ -367,8 +368,10 @@
+         .title-label {
+             flex: 1;
+             padding-left: 1.5rem;
+-            font-weight: 600;
++            font-size: 0.9rem;
++            font-weight: 500;
+             text-align: center;
++            opacity: 0.7;
+             display: -webkit-box;
+             -webkit-line-clamp: 2;
+             -webkit-box-orient: vertical;
+diff --git a/src/components/MetaRow/styles.less b/src/components/MetaRow/styles.less
+index 241fdcc..47c042a 100644
+--- a/src/components/MetaRow/styles.less
++++ b/src/components/MetaRow/styles.less
+@@ -61,8 +61,9 @@
+         .title-container {
+             flex: 1;
+             max-height: 2.4em;
+-            font-size: 1.6rem;
+-            font-weight: 500;
++            font-size: 1.35rem;
++            font-weight: 700;
++            letter-spacing: -0.02em;
+         }
+ 
+         .see-all-container {
+@@ -74,7 +75,8 @@
+             height: 2.5rem;
+             padding: 0 0.5rem 0 1rem;
+             border-radius: 2.5rem;
+-            opacity: 0.6;
++            font-size: 0.9rem;
++            opacity: 0.45;
+ 
+             &:hover, &:focus {
+                 outline: none;
+diff --git a/src/components/NavBar/HorizontalNavBar/styles.less b/src/components/NavBar/HorizontalNavBar/styles.less
+index 6984478..18256c4 100644
+--- a/src/components/NavBar/HorizontalNavBar/styles.less
++++ b/src/components/NavBar/HorizontalNavBar/styles.less
+@@ -13,6 +13,7 @@
+     overflow: visible;
+     padding-top: var(--safe-area-inset-top);
+     box-sizing: content-box;
++    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+ 
+     .logo-container {
+         flex: none;
+@@ -24,11 +25,12 @@
+ 
+         .logo {
+             flex: none;
+-            width: 2.5rem;
+-            height: 2.5rem;
++            width: 2rem;
++            height: 2rem;
+             object-position: center;
+             object-fit: contain;
+             opacity: 0.9;
++            filter: grayscale(1) brightness(1.6);
+         }
+     }
+ 
+@@ -49,8 +51,10 @@
+     }
+ 
+     .search-bar {
+-        height: 3.25rem;
+-        width: 30rem;
++        height: 2.75rem;
++        width: 17rem;
++        margin-left: auto;
++        margin-right: 0.5rem;
+     }
+ 
+     .buttons-container {
+@@ -85,15 +89,15 @@
+         display: flex;
+         align-items: center;
+         justify-content: center;
+-        width: 3.5rem;
+-        height: 3.5rem;
+-        border-radius: 0.75rem;
+-        opacity: 0.6;
++        width: 2.75rem;
++        height: 2.75rem;
++        border-radius: 50%;
++        opacity: 0.7;
+ 
+         .icon {
+             flex: none;
+-            width: 2rem;
+-            height: 2rem;
++            width: 1.5rem;
++            height: 1.5rem;
+             opacity: 0.6;
+         }
+ 
+@@ -119,11 +123,26 @@
+     }
+ }
+ 
++// Leave room for the centered tabs on narrower screens
++@media only screen and (max-width: @small) {
++    .horizontal-nav-bar-container {
++        .search-bar {
++            width: 12rem;
++        }
++    }
++}
++
+ @media only screen and (max-width: @minimum) {
+     .horizontal-nav-bar-container {
+         justify-content: space-between;
+         padding-right: 0;
+ 
++        .search-bar {
++            flex: 1;
++            width: auto;
++            margin: 0 0.5rem;
++        }
++
+         .logo-container {
+             width: var(--horizontal-nav-bar-size);
+         }
+diff --git a/src/components/NavBar/VerticalNavBar/NavTabButton/styles.less b/src/components/NavBar/VerticalNavBar/NavTabButton/styles.less
+index a3e4503..cd33efd 100644
+--- a/src/components/NavBar/VerticalNavBar/NavTabButton/styles.less
++++ b/src/components/NavBar/VerticalNavBar/NavTabButton/styles.less
+@@ -5,72 +5,70 @@
+ 
+ .nav-tab-button-container {
+     display: flex;
+-    flex-direction: column;
++    flex-direction: row;
+     align-items: center;
+     justify-content: center;
+-    border-radius: 0.75rem;
++    padding: 0 1.4rem;
++    border-radius: 3rem;
++    transition: background-color 150ms ease-out, color 150ms ease-out;
++
++    .icon, .logo {
++        display: none;
++    }
++
++    .label {
++        flex: none;
++        font-size: 0.95rem;
++        font-weight: 600;
++        white-space: nowrap;
++        opacity: 0.6;
++        transition: opacity 150ms ease-out;
++    }
+ 
+     @media (pointer: fine) {
+         &:hover {
+-            background-color: var(--overlay-color);
+-
+             .label {
+-                opacity: 0.6;
+-            }
+-
+-            &:global(.selected) {
+-                .label {
+-                    opacity: 1;
+-                }
++                opacity: 1;
+             }
+         }
+     }
+ 
+     &:global(.selected) {
+-        .icon {
+-            opacity: 1;
+-        }
++        background-color: rgba(255, 255, 255, 0.92);
+ 
+-        .icon, .label {
+-            color: var(--primary-accent-color);
++        .label {
++            color: #000000;
++            opacity: 1;
+         }
+     }
+-
+-    .icon, .logo {
+-        flex: none;
+-        width: 2.2rem;
+-        height: 2.2rem;
+-        margin-bottom: 0.5rem;
+-    }
+-
+-    .icon {
+-        opacity: 0.35;
+-    }
+-
+-    .label {
+-        flex: none;
+-        position: relative;
+-        max-width: 100%;
+-        max-height: 2.4em;
+-        padding: 0 0.5rem;
+-        font-size: 0.8rem;
+-        font-weight: 500;
+-        letter-spacing: 0.01rem;
+-        text-align: center;
+-        white-space: nowrap;
+-        text-overflow: ellipsis;
+-        opacity: 0;
+-    }
+ }
+ 
+ @media only screen and (max-width: @minimum) {
+     .nav-tab-button-container {
++        flex-direction: column;
++        gap: 0.25rem;
++        padding: 0;
++        border-radius: 0;
++
++        .icon, .logo {
++            display: block;
++            flex: none;
++            width: 1.6rem;
++            height: 1.6rem;
++            opacity: 0.5;
++        }
++
+         .label {
+-            opacity: 0.6;
++            font-size: 0.7rem;
++            font-weight: 500;
++            opacity: 0.5;
+         }
+ 
+         &:global(.selected) {
+-            .label {
++            background-color: transparent;
++
++            .icon, .label {
++                color: var(--primary-foreground-color);
+                 opacity: 1;
+             }
+         }
+@@ -82,7 +80,7 @@
+         transition: scale 100ms ease-out;
+ 
+         &:active {
+-            scale: 0.9;
++            scale: 0.92;
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/NavBar/VerticalNavBar/styles.less b/src/components/NavBar/VerticalNavBar/styles.less
+index 5d96e58..a678a4f 100644
+--- a/src/components/NavBar/VerticalNavBar/styles.less
++++ b/src/components/NavBar/VerticalNavBar/styles.less
+@@ -3,55 +3,41 @@
+ @import (reference) '~@stremio/stremio-colors/less/stremio-colors.less';
+ @import (reference) '~stremio/common/screen-sizes.less';
+ 
++// Desktop: a frosted-glass pill of text tabs centered in the top bar
+ .vertical-nav-bar-container {
+     display: flex;
+-    flex-direction: column;
++    flex-direction: row;
+     align-items: center;
+-    gap: 1rem;
+-    width: var(--vertical-nav-bar-size);
+-    padding: 1rem 0;
+-    overflow-y: auto;
+-    scrollbar-width: none;
+-    -ms-overflow-style: none;
+-
+-    &::-webkit-scrollbar {
+-        display: none;
+-    }
++    gap: 0.25rem;
++    height: 3rem;
++    padding: 0.25rem;
++    border-radius: 3rem;
++    border: 1px solid var(--glass-border);
++    background-color: var(--glass-background);
++    backdrop-filter: var(--glass-blur);
++    -webkit-backdrop-filter: var(--glass-blur);
++    overflow: visible;
+ 
+     .nav-tab-button {
+-        width: calc(var(--vertical-nav-bar-size) - 1.2rem);
+-        height: calc(var(--vertical-nav-bar-size) - 1.2rem);
+-        min-height: 3.5rem;
++        flex: none;
++        height: 100%;
+     }
+ }
+ 
++// Phone: an iOS-style frosted tab bar along the bottom
+ @media only screen and (max-width: @minimum) {
+     .vertical-nav-bar-container {
+-        flex-direction: row;
+-        justify-content: space-between;
++        justify-content: space-around;
+         gap: 0;
+         height: var(--vertical-nav-bar-size);
+         width: 100%;
+         padding: 0 1rem;
+-        overflow-y: hidden;
+-        overflow-x: auto;
++        border-radius: 0;
++        border: none;
++        border-top: 1px solid var(--glass-border);
+ 
+         .nav-tab-button {
+-            flex: none;
+-
+-            &:last-child {
+-                display: none;
+-            }
++            flex: 1;
+         }
+     }
+ }
+-
+-@media only screen and (max-height: @minimum) {
+-    .vertical-nav-bar-container {
+-        .nav-tab-button {
+-            &:last-child {
+-                display: none;
+-            }
+-        }
+-    }
+-}
+\ No newline at end of file
+diff --git a/src/index.html b/src/index.html
+index 409fd43..ae31970 100644
+--- a/src/index.html
++++ b/src/index.html
+@@ -8,7 +8,7 @@
+     <meta name="apple-mobile-web-app-capable" content="yes">
+     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+     <meta name="apple-mobile-web-app-title" content="Stremio">
+-    <meta name="theme-color" content="#2a2843">
++    <meta name="theme-color" content="#000000">
+     <link rel="icon" type="image/x-icon" href="<%= htmlWebpackPlugin.options.faviconsPath %>/favicon.ico">
+     <link rel="apple-touch-icon" href="<%= htmlWebpackPlugin.options.imagesPath %>/icon_196x196.png">
+     <link rel="apple-touch-startup-image" href="<%= htmlWebpackPlugin.options.imagesPath %>/splash/apple-splash-2064-2752.jpg" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+diff --git a/src/routes/Board/Board.js b/src/routes/Board/Board.js
+index ee3d1ea..5c98eac 100644
+--- a/src/routes/Board/Board.js
++++ b/src/routes/Board/Board.js
+@@ -11,6 +11,7 @@ const useContinueWatchingPreview = require('./useContinueWatchingPreview');
+ const { default: useLiveTvContinueWatching } = require('./useLiveTvContinueWatching');
+ const styles = require('./styles');
+ const { default: StreamingServerWarning } = require('./StreamingServerWarning');
++const Hero = require('./Hero');
+ 
+ const THRESHOLD = 5;
+ 
+@@ -27,6 +28,7 @@ const Board = () => {
+             .map((item) => ({ ...item, posterShape: 'landscape' })),
+     }), [liveTvContinueWatching.items]);
+     const boardCatalogsOffset =
++        1 + // Hero
+         (continueWatchingPreview.items.length > 0 ? 1 : 0) +
+         (liveTvCatalog.items.length > 0 ? 1 : 0);
+     const showStreamingServerWarning = React.useMemo(() => {
+@@ -45,6 +47,7 @@ const Board = () => {
+             <EventModal />
+             <MainNavBars className={styles['board-content-container']} route={'board'}>
+                 <div ref={scrollContainerRef} className={styles['board-content']} onScroll={onScroll}>
++                    <Hero className={styles['board-hero']} catalogs={board.catalogs} />
+                     {
+                         continueWatchingPreview.items.length > 0 ?
+                             <MetaRow
+diff --git a/src/routes/Board/Hero/Hero.js b/src/routes/Board/Hero/Hero.js
+new file mode 100644
+index 0000000..4cba080
+--- /dev/null
++++ b/src/routes/Board/Hero/Hero.js
+@@ -0,0 +1,118 @@
++// Copyright (C) 2017-2023 Smart code 203358507
++
++const React = require('react');
++const PropTypes = require('prop-types');
++const classnames = require('classnames');
++const { default: Icon } = require('@stremio/stremio-icons/react');
++const { Button, Image } = require('stremio/components');
++const { default: getMetaDetailsHref } = require('stremio/common/getMetaDetailsHref');
++const styles = require('./styles');
++
++const MAX_ITEMS = 6;
++const ROTATE_INTERVAL = 8000;
++
++const metahubUrl = (kind, id) => `https://images.metahub.space/${kind}/large/${id}/img`;
++
++// Feature titles from the first loaded catalog that has IMDb items (they have artwork)
++const pickItems = (catalogs) => {
++    for (const catalog of catalogs) {
++        if (catalog.content?.type === 'Ready' && Array.isArray(catalog.content.content)) {
++            const items = catalog.content.content.filter((item) => typeof item.id === 'string' && item.id.startsWith('tt'));
++            if (items.length > 0) {
++                return items.slice(0, MAX_ITEMS);
++            }
++        }
++    }
++
++    return [];
++};
++
++const Hero = ({ className, catalogs }) => {
++    const items = React.useMemo(() => pickItems(catalogs), [catalogs]);
++    const [index, setIndex] = React.useState(0);
++    const selectedIndex = items.length > 0 ? index % items.length : 0;
++    const item = items[selectedIndex];
++
++    React.useEffect(() => {
++        if (items.length < 2) {
++            return;
++        }
++
++        const timeout = setTimeout(() => setIndex((selectedIndex + 1) % items.length), ROTATE_INTERVAL);
++        return () => clearTimeout(timeout);
++    }, [items.length, selectedIndex]);
++
++    const renderTitle = React.useCallback(() => (
++        <div className={styles['title']}>{item ? item.name : ''}</div>
++    ), [item]);
++
++    // Always render an element so the board's row index offsets stay stable
++    if (!item) {
++        return <div className={className} />;
++    }
++
++    const href = getMetaDetailsHref(item.deepLinks);
++    const meta = [item.type === 'series' ? 'Series' : item.type === 'movie' ? 'Movie' : item.type, item.releaseInfo]
++        .filter((value) => typeof value === 'string' && value.length > 0)
++        .join('  ·  ');
++
++    return (
++        <div className={classnames(className, styles['hero-container'])}>
++            {items.map((heroItem, heroIndex) => (
++                <Image
++                    key={heroItem.id}
++                    className={classnames(styles['backdrop'], { [styles['active']]: heroIndex === selectedIndex })}
++                    src={typeof heroItem.background === 'string' ? heroItem.background : metahubUrl('background', heroItem.id)}
++                    fallbackSrc={typeof heroItem.poster === 'string' ? heroItem.poster : undefined}
++                    alt={' '}
++                />
++            ))}
++            <div className={styles['shade']} />
++            <div key={item.id} className={styles['info']}>
++                <Image
++                    className={styles['logo']}
++                    src={typeof item.logo === 'string' ? item.logo : metahubUrl('logo', item.id)}
++                    alt={item.name}
++                    renderFallback={renderTitle}
++                />
++                {meta.length > 0 ? <div className={styles['meta']}>{meta}</div> : null}
++                {
++                    typeof item.description === 'string' && item.description.length > 0 ?
++                        <div className={styles['description']}>{item.description}</div>
++                        :
++                        null
++                }
++                {
++                    typeof href === 'string' ?
++                        <Button className={styles['watch-button']} href={href} tabIndex={-1}>
++                            <Icon className={styles['icon']} name={'play'} />
++                            <div className={styles['label']}>Watch</div>
++                        </Button>
++                        :
++                        null
++                }
++            </div>
++            {
++                items.length > 1 ?
++                    <div className={styles['dots']}>
++                        {items.map((heroItem, heroIndex) => (
++                            <div
++                                key={heroItem.id}
++                                className={classnames(styles['dot'], { [styles['active']]: heroIndex === selectedIndex })}
++                                onClick={() => setIndex(heroIndex)}
++                            />
++                        ))}
++                    </div>
++                    :
++                    null
++            }
++        </div>
++    );
++};
++
++Hero.propTypes = {
++    className: PropTypes.string,
++    catalogs: PropTypes.arrayOf(PropTypes.object).isRequired,
++};
++
++module.exports = Hero;
+diff --git a/src/routes/Board/Hero/index.js b/src/routes/Board/Hero/index.js
+new file mode 100644
+index 0000000..a1c6b9c
+--- /dev/null
++++ b/src/routes/Board/Hero/index.js
+@@ -0,0 +1,5 @@
++// Copyright (C) 2017-2023 Smart code 203358507
++
++const Hero = require('./Hero');
++
++module.exports = Hero;
+diff --git a/src/routes/Board/Hero/styles.less b/src/routes/Board/Hero/styles.less
+new file mode 100644
+index 0000000..8f630b3
+--- /dev/null
++++ b/src/routes/Board/Hero/styles.less
+@@ -0,0 +1,188 @@
++// Copyright (C) 2017-2024 Smart code 203358507
++
++@import (reference) '~stremio/common/screen-sizes.less';
++
++.hero-container {
++    position: relative;
++    z-index: 0;
++    display: flex;
++    flex-direction: row;
++    align-items: flex-end;
++    height: clamp(26rem, 72vh, 54rem);
++    margin: 0 -1rem 0.5rem;
++
++    .backdrop {
++        position: absolute;
++        top: 0;
++        right: 0;
++        bottom: 0;
++        left: 0;
++        z-index: 0;
++        width: 100%;
++        height: 100%;
++        object-fit: cover;
++        object-position: center 20%;
++        opacity: 0;
++        transform: scale(1.06);
++        transition: opacity 1.2s ease, transform 9s linear;
++
++        &.active {
++            opacity: 1;
++            transform: scale(1);
++        }
++    }
++
++    .shade {
++        position: absolute;
++        top: 0;
++        right: 0;
++        bottom: 0;
++        left: 0;
++        z-index: 1;
++        background:
++            linear-gradient(to top, var(--primary-background-color) 0%, rgba(0, 0, 0, 0.5) 32%, rgba(0, 0, 0, 0) 60%),
++            linear-gradient(to right, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 55%),
++            linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 22%);
++    }
++
++    .info {
++        position: relative;
++        z-index: 2;
++        max-width: 38rem;
++        padding: 0 3.5rem 3.5rem;
++        animation: hero-fade-in 0.8s ease both;
++
++        .logo {
++            display: block;
++            max-width: 26rem;
++            max-height: 9rem;
++            margin-bottom: 1.25rem;
++            object-fit: contain;
++            object-position: left bottom;
++            filter: drop-shadow(0 0.25rem 1.25rem rgba(0, 0, 0, 0.5));
++        }
++
++        .title {
++            margin-bottom: 1rem;
++            font-size: 3.25rem;
++            font-weight: 800;
++            line-height: 1.05;
++            letter-spacing: -0.03em;
++        }
++
++        .meta {
++            margin-bottom: 0.75rem;
++            font-size: 0.9rem;
++            font-weight: 600;
++            text-transform: capitalize;
++            opacity: 0.7;
++        }
++
++        .description {
++            display: -webkit-box;
++            -webkit-line-clamp: 3;
++            -webkit-box-orient: vertical;
++            margin-bottom: 1.5rem;
++            font-size: 1rem;
++            line-height: 1.45;
++            opacity: 0.8;
++        }
++
++        .watch-button {
++            display: inline-flex;
++            flex-direction: row;
++            align-items: center;
++            gap: 0.6rem;
++            height: 3rem;
++            padding: 0 1.9rem;
++            border-radius: 3rem;
++            background-color: rgba(255, 255, 255, 0.95);
++            transition: transform 200ms ease-out, background-color 200ms ease-out;
++
++            .icon {
++                flex: none;
++                width: 1.2rem;
++                height: 1.2rem;
++                color: #000000;
++            }
++
++            .label {
++                flex: none;
++                font-weight: 700;
++                color: #000000;
++            }
++
++            &:hover, &:focus {
++                outline: none;
++                background-color: #ffffff;
++                transform: scale(1.05);
++            }
++        }
++    }
++
++    .dots {
++        position: absolute;
++        right: 3.5rem;
++        bottom: 3.75rem;
++        z-index: 2;
++        display: flex;
++        flex-direction: row;
++        gap: 0.5rem;
++
++        .dot {
++            width: 0.5rem;
++            height: 0.5rem;
++            border-radius: 1rem;
++            background-color: rgba(255, 255, 255, 0.35);
++            cursor: pointer;
++            transition: width 300ms ease, background-color 300ms ease;
++
++            &.active {
++                width: 1.5rem;
++                background-color: rgba(255, 255, 255, 0.95);
++            }
++        }
++    }
++}
++
++@keyframes hero-fade-in {
++    from {
++        opacity: 0;
++        transform: translateY(1rem);
++    }
++
++    to {
++        opacity: 1;
++        transform: none;
++    }
++}
++
++@media only screen and (max-width: @minimum) {
++    .hero-container {
++        height: 30rem;
++        margin: 0 -1rem 0;
++
++        .info {
++            max-width: 100%;
++            padding: 0 1.25rem 2rem;
++
++            .logo {
++                max-width: 70%;
++                max-height: 6rem;
++            }
++
++            .title {
++                font-size: 2.25rem;
++            }
++
++            .description {
++                -webkit-line-clamp: 2;
++                font-size: 0.9rem;
++            }
++        }
++
++        .dots {
++            display: none;
++        }
++    }
++}
+diff --git a/src/routes/Board/styles.less b/src/routes/Board/styles.less
+index 3a22193..71d654c 100644
+--- a/src/routes/Board/styles.less
++++ b/src/routes/Board/styles.less
+@@ -12,6 +12,10 @@
+     meta-item-placeholder: meta-item;
+ }
+ 
++:import('~stremio/components/MainNavBars/MainNavBars.less') {
++    nav-content-container: nav-content-container;
++}
++
+ .board-container {
+     width: 100%;
+     height: calc(100% - var(--safe-area-inset-bottom));
+@@ -22,15 +26,30 @@
+         flex: 1;
+         align-self: stretch;
+ 
++        // Let the hero banner run underneath the transparent top bar
++        .nav-content-container {
++            top: 0;
++        }
++
+         .board-content {
+             height: 100%;
+             width: 100%;
+-            padding: 0 1rem;
++            padding: calc(var(--horizontal-nav-bar-size) + var(--safe-area-inset-top)) 1rem 0;
+             overflow-y: auto;
+ 
++            .board-hero:not(:empty) {
++                margin-top: calc(-1 * (var(--horizontal-nav-bar-size) + var(--safe-area-inset-top)));
++            }
++
+             .board-row {
+-                margin-top: 1rem;
+-                margin-bottom: 2rem;
++                margin-top: 0.5rem;
++                margin-bottom: 1.5rem;
++            }
++
++            .board-hero:not(:empty) + .board-row {
++                margin-top: -2rem;
++                position: relative;
++                z-index: 1;
+             }
+         }
+     }
+@@ -62,6 +81,10 @@
+                     margin-bottom: 1.5rem;
+                 }
+ 
++                .board-hero:not(:empty) + .board-row {
++                    margin-top: 0.5rem;
++                }
++
+                 .board-row-poster, .board-row-square, .continue-watching-row, .board-row-landscape {
+                     .meta-item {
+                         &:not(:empty) {
