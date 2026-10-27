@@ -8,7 +8,7 @@ What it changes:
 
 - Black, frosted-glass look with the system (San Francisco) font
 - Top tabs reduced to Home, Discover and Library; Add-ons and Settings are in the profile menu
-- A rotating full-width banner on Home
+- A rotating full-width banner on Home (swipe on phones, arrows on hover with a mouse)
 - Posters that lift on hover instead of getting an outline; quieter titles and row headings
 - An iOS-style tab bar on phones
 
